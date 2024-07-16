@@ -9,6 +9,7 @@ import axiosInstance from "../../utils/axiosInstance";
 import Toast from "../../components/ToastMessage/Toast";
 import EmptyCard from "../../components/EmptyCard/EmptyCard";
 import AddNotesImg from "../../assets/images/add-notes.png";
+import noDataImg from "../../assets/images/no-data.jpg";
 
 const Home = () => {
 
@@ -23,6 +24,8 @@ const Home = () => {
         message: "",
         type: "add"
     });
+
+    const [isSearch, setIsSearch] = useState(false);
 
     const [allNotes, setAllNotes] = useState([]);
     const [userInfo, setUserInfo] = useState(null);
@@ -98,6 +101,28 @@ const Home = () => {
         }
     }
 
+    // Search for a Note
+    const onSearchNote = async (query) => {
+        try {
+            const response = await axiosInstance.get("/search-notes", {
+                params: {query},
+            });
+
+            if (response.data && response.data.notes) {
+                setIsSearch(true);
+                setAllNotes(response.data.notes);
+            }
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const handleClearSearch = () => {
+        setIsSearch(false);
+        getAllNotes();
+    }
+
     useEffect(() => {
         getAllNotes();
         getUserInfo();
@@ -106,7 +131,11 @@ const Home = () => {
 
     return (
         <>
-            <Navbar userInfo={userInfo} />
+            <Navbar 
+                userInfo={userInfo} 
+                onSearchNote={onSearchNote} 
+                handleClearSearch={handleClearSearch}
+            />
 
             <div className="container mx-auto">
                 {allNotes.length > 0 ? (
@@ -127,9 +156,13 @@ const Home = () => {
                     </div>
                 ) : (
                     <EmptyCard 
-                        imgSrc={AddNotesImg}
-                        message={`Start creating your first note! Click the 'Add' button to jot down your
-                            thoughts, ideas, and reminders. Let's get started!`}
+                        imgSrc={isSearch ? noDataImg : AddNotesImg}
+                        message={
+                            isSearch 
+                                ? `Oops! No notes found matching your search` 
+                                : `Start creating your first note! Click the 'Add' button to jot down your
+                            thoughts, ideas, and reminders. Let's get started!`
+                        }
                     />
                 )}
                 
