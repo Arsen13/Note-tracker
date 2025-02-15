@@ -153,6 +153,7 @@ const Home = () => {
                 userInfo={userInfo} 
                 onSearchNote={onSearchNote} 
                 handleClearSearch={handleClearSearch}
+                authorized={true}
             />
 
             <div className="container mx-auto">
